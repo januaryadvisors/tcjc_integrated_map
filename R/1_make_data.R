@@ -37,3 +37,5 @@ df <- tx_counties %>%
 
 geojson_write(df, file = here::here("data", paste0("mapdata", ".json")))
 
+geojson_write(df, file = here::here(paste0("mapdata", ".json")))
+
