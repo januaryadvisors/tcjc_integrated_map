@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+		<title>TCJC Integrated Map</title>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+		<style type="text/css">
+
+			@import url('https://fonts.googleapis.com/css?family=Barlow&display=swap');
+
+			h1, h3, p , #map {
+				font-family: Barlow, sans-serif;
+				margin:0px;
+			}
+
+			text {
+				font-family: Barlow, sans-serif;
+				font-size: 12px;
+			}
+
+			@media only screen and (min-width: 1025px){
+			   	#map { 
+					height: 500px;
+					width: 50%;
+					float: left;
+				}
+	
+			}
+
+			.svg-container {
+			    display: inline-block;
+			    position: relative;
+			    width: 100%;
+			    padding-bottom: 100%;
+			    vertical-align: top;
+			    overflow: hidden;
+			}
+			.svg-content {
+			    display: inline-block;
+			    position: absolute;
+			    top: 0;
+			    left: 0;
+			}
+
+			.hidden {
+		      display: none;
+		    }
+
+		    div.tooltip {
+		      color: #222; 
+		      background: #fff; 
+		      border-radius: 3px; 
+		      box-shadow: 0px 0px 2px 0px #a6a6a6; 
+		      padding: .2em; 
+		      text-shadow: #f5f5f5 0 1px 0;
+		      opacity: 0.9; 
+		      position: absolute;
+		    }
+
+		</style>
+	</head>
+	<body>
+		<div id = "container">
+			<h1 style="visibility: hidden;">TCJC Criminal Court Dashboards</h1>
+			<div id = 'map' class="svg-container"></div>
+		</div>
+		<script type="text/javascript">
+			//Overall setup
+			//Width and height
+			var w = 500;
+			var h = 500;
+
+			//Map setup
+			var map_g = d3.select("#map")
+				.append("svg")
+				.attr("width", w)
+				.attr("height", h);
+
+
+			//Color
+			const color = d3.scaleLinear()
+				.domain([1,2])
+				.range(["#d3d3d3", "#215FB5"]);
+
+    		//Tooltip
+			var tooltip = d3.select("#map")
+				.append("div")
+				.attr("class", "tooltip hidden")
+
+			var offsetL = document.getElementById('map').offsetLeft-30;
+    		var offsetT = document.getElementById('map').offsetTop-30;
+
+			const showTooltip = function (d) {
+		      	label = `<strong>${d.properties.NAME} County</strong></br>${d.properties.MESSAGE}`;
+
+		      	var mouse = d3.mouse(map_g.node())
+		        	.map( function(d) { return parseInt(d); } );
+
+		      	tooltip.classed("hidden", false)
+		        	.attr("style", "left:"+(mouse[0]+offsetL)+"px;top:"+(mouse[1]+offsetT)+"px")
+		        	.html(label);
+		    }
+
+		    //Highlight 
+		    const highlight = function(d) {
+		    	selected = d.id;
+
+		    	map_g.selectAll("path")
+		    		.transition()
+		    		.duration(50)
+		    		.style("fill", function(d){
+		    			return (d.id == selected ? "black" : color(d.properties.GROUP))
+		    		})
+		    }
+
+		    const unhighlight = function(d) {
+		    	map_g.selectAll("path")
+		    		.transition()
+		    		.duration(100)
+		    		.style("fill", function(d) {
+					   		var value = d.properties.GROUP
+					   		if(value) {
+					   			return color(value);
+					   		} else {
+					   			return "#ccc"; //Defines NA color value
+					   		}
+					   	})
+
+		    }
+
+		    //Interactive functions
+			const mouseEnter = function(d) {
+				showTooltip(d)
+				highlight(d)
+
+			}
+
+			const mouseOut = function(d,i) {
+				tooltip.classed("hidden", true);
+				unhighlight(d)
+			}
+
+
+			//Load in map data
+			d3.json("/data/mapdata.json").then(function(json) {
+			  console.log(json);
+
+
+
+			  //Define map projection
+				var projection = d3.geoMercator()
+									.fitSize([w, h], json);
+
+				//Define path generator
+				var path = d3.geoPath()
+							 .projection(projection);
+				
+				//Bind data and create one path per GeoJSON feature
+				//Create map
+				var map = map_g.selectAll("path")
+				   	.data(json.features)
+				    .enter()
+				    .append("a")
+				    	.attr("class", "link")
+				    	.attr('xlink:href', function(d) { 
+				    		if (d.properties.GROUP==2) {
+				    			return d.properties.LINK
+				    		}
+				    	})
+				    	.attr('target', "_blank")
+				    .append("path")
+					    .attr("d", path)
+					    .style("stroke", "white")
+					    .style("fill", function(d) {
+					   		var value = d.properties.GROUP
+					   		if(value) {
+					   			return color(value);
+					   		} else {
+					   			return "#ccc"; //Defines NA color value
+					   		}
+					   	})
+				    .on("mousemove", mouseEnter)
+				    .on("mouseout", mouseOut);
+
+
+
+			});
+
+
+
+
+
+				
+		</script>
+	</body>
+</html>
