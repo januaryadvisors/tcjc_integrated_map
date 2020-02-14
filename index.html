@@ -8,62 +8,56 @@
 
 			@import url('https://fonts.googleapis.com/css?family=Barlow&display=swap');
 
+
 			h1, h3, p , #map {
 				font-family: Barlow, sans-serif;
 				margin:0px;
+				/*height: 0px;*/
 			}
+
 
 			text {
 				font-family: Barlow, sans-serif;
 				font-size: 12px;
 			}
 
-			@media only screen and (min-width: 1025px){
-			   	#map { 
-					height: 500px;
-					width: 50%;
-					float: left;
-				}
-	
-			}
 
-			.svg-container {
-			    display: inline-block;
-			    position: relative;
-			    width: 100%;
-			    padding-bottom: 100%;
-			    vertical-align: top;
-			    overflow: hidden;
+			#tooltip {
+				position: absolute;
+				width: 200px;
+				height: auto;
+				padding: 10px;
+				background-color: white;
+				-webkit-border-radius: 10px;
+				-moz-border-radius: 10px;
+				border-radius: 10px;
+				-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				pointer-events: none;
 			}
-			.svg-content {
-			    display: inline-block;
-			    position: absolute;
-			    top: 0;
-			    left: 0;
+			
+			#tooltip.hidden {
+				display: none;
 			}
-
-			.hidden {
-		      display: none;
-		    }
-
-		    div.tooltip {
-		      color: #222; 
-		      background: #fff; 
-		      border-radius: 3px; 
-		      box-shadow: 0px 0px 2px 0px #a6a6a6; 
-		      padding: .2em; 
-		      text-shadow: #f5f5f5 0 1px 0;
-		      opacity: 0.9; 
-		      position: absolute;
-		    }
+			
+			#tooltip p {
+				margin: 0;
+				font-family: sans-serif;
+				font-size: 16px;
+				line-height: 20px;
+			}
 
 		</style>
 	</head>
 	<body>
-		<div id = "container">
-			<h1 style="visibility: hidden;">TCJC Criminal Court Dashboards</h1>
-			<div id = 'map' class="svg-container"></div>
+		<!-- <h1 style="visibility: hidden;">TCJC Criminal Court Dashboards</h1>
+		<div id = 'blank'> </div> -->
+		<div id="tooltip" class="hidden">
+			<p><strong>Important Label Heading</strong></p>
+			<p><span id="value">100</span>%</p>
 		</div>
+		<div id = 'map' ></div>
 		<script type="text/javascript">
 			//Overall setup
 			//Width and height
@@ -71,7 +65,7 @@
 			var h = 500;
 
 			//Map setup
-			var map_g = d3.select("#map")
+			var map_g = d3.select("body")
 				.append("svg")
 				.attr("width", w)
 				.attr("height", h);
@@ -118,25 +112,24 @@
 		    		.transition()
 		    		.duration(100)
 		    		.style("fill", function(d) {
-					   		var value = d.properties.GROUP
-					   		if(value) {
-					   			return color(value);
-					   		} else {
-					   			return "#ccc"; //Defines NA color value
-					   		}
-					   	})
-
+				   		var value = d.properties.GROUP
+				   		if(value) {
+				   			return color(value);
+				   		} else {
+				   			return "#ccc"; //Defines NA color value
+				   		}
+				   	})
 		    }
 
 		    //Interactive functions
 			const mouseEnter = function(d) {
 				showTooltip(d)
 				highlight(d)
-
 			}
 
 			const mouseOut = function(d,i) {
-				tooltip.classed("hidden", true);
+				//Hide the tooltip
+				d3.select("#tooltip").classed("hidden", true);
 				unhighlight(d)
 			}
 
@@ -181,7 +174,6 @@
 					   	})
 				    .on("mousemove", mouseEnter)
 				    .on("mouseout", mouseOut);
-
 
 
 			});
