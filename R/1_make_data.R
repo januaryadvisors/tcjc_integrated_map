@@ -16,7 +16,7 @@ tx_counties <- tigris::counties(cb=T, state="TX") %>% st_as_sf() %>% st_transfor
 # Set links -----------------------------------------------
 harris_link <- "https://tcjcdashboard.org/harris/"
 dallas_link <- "https://tcjcdashboard.org/dallas/"
-#bexar_link <- "https://tcjcdashboard.org/bexar/"
+bexar_link <- "https://tcjcdashboard.org/bexar/"
 
 
 # Combine and export data ---------------------------------------
@@ -25,7 +25,7 @@ df <- tx_counties %>%
     LINK = case_when(
       NAME == "Harris" ~ harris_link,
       NAME == "Dallas" ~ dallas_link,
-      #NAME == "Bexar" ~ bexar_link,
+      NAME == "Bexar" ~ bexar_link,
       TRUE ~ "NA"
     ),
     GROUP = ifelse(LINK=="NA", 1, 2),
