@@ -17,7 +17,7 @@ tx_counties <- tigris::counties(cb=T, state="TX") %>% st_as_sf() %>% st_transfor
 harris_link <- "https://tcjcdashboard.org/harris/"
 dallas_link <- "https://tcjcdashboard.org/dallas/"
 bexar_link <- "https://tcjcdashboard.org/bexar/"
-
+travis_link <- "https://tcjcdashboard.org/travis-county-dashboard/"
 
 # Combine and export data ---------------------------------------
 df <- tx_counties %>% 
@@ -26,16 +26,16 @@ df <- tx_counties %>%
       NAME == "Harris" ~ harris_link,
       NAME == "Dallas" ~ dallas_link,
       NAME == "Bexar" ~ bexar_link,
+      NAME == "Travis" ~ travis_link,
       TRUE ~ "NA"
     ),
     GROUP = ifelse(LINK=="NA", 1, 2),
     MESSAGE = ifelse(LINK=="NA", "No data yet!", "Click to explore the data!")
   ) %>% 
-  dplyr::select(GEOID, NAME, LINK, GROUP, MESSAGE) %>%  
+  dplyr::select(GEOID, NAME, LINK, GROUP, MESSAGE) %>% 
   as(., "Spatial") %>% 
   geojson_json(.) %>% ms_simplify(.)
 
 geojson_write(df, file = here::here("data", paste0("mapdata", ".json")))
-
 geojson_write(df, file = here::here(paste0("mapdata", ".json")))
 
