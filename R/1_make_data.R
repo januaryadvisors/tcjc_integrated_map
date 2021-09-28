@@ -14,10 +14,10 @@ tx_counties <- tigris::counties(cb=T, state="TX") %>% st_as_sf() %>% st_transfor
 
 
 # Set links -----------------------------------------------
-harris_link <- "https://tcjcdashboard.org/harris/"
-dallas_link <- "https://tcjcdashboard.org/dallas/"
-bexar_link <- "https://tcjcdashboard.org/bexar/"
-travis_link <- "https://tcjcdashboard.org/travis-county-dashboard/"
+harris_link <- "https://tcjedashboard.org/harris/"
+dallas_link <- "https://tcjedashboard.org/dallas/"
+bexar_link <- "https://tcjedashboard.org/bexar/"
+travis_link <- "https://tcjedashboard.org/travis-county-dashboard/"
 
 # Combine and export data ---------------------------------------
 df <- tx_counties %>% 
